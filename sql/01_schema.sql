@@ -55,7 +55,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `pokedados`.`tipos` ;
 
 CREATE TABLE IF NOT EXISTS `pokedados`.`tipos` (
-  `tipoID` INT NOT NULL,
+  `tipoID` INT NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(30) NOT NULL,
   PRIMARY KEY (`tipoID`),
   UNIQUE INDEX `nome_UNIQUE` (`nome` ASC) VISIBLE)
