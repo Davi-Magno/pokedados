@@ -1,0 +1,1118 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PokéDados - Painel Analítico</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Plus Jakarta Sans", "sans-serif"],
+            },
+            colors: {
+              forest: {
+                50: "#f0fdf4",
+                100: "#dcfce7",
+                200: "#bbf7d0",
+                500: "#22c55e",
+                600: "#16a34a",
+                700: "#15803d",
+                800: "#166534",
+                900: "#14532d",
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      /* Natural Blurred Background Effect */
+      body {
+        background:
+          linear-gradient(
+            135deg,
+            rgba(212, 230, 218, 0.8),
+            rgba(235, 243, 238, 0.9)
+          ),
+          url("https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        color: #1e293b;
+      }
+
+      /* Glassmorphism Containers matching user image */
+      .glass-card {
+        background: rgba(246, 248, 246, 0.85);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 20px;
+        box-shadow:
+          0 10px 30px -5px rgba(0, 0, 0, 0.04),
+          0 4px 12px -2px rgba(0, 0, 0, 0.02);
+      }
+
+      .glass-sidebar {
+        background: rgba(238, 242, 239, 0.88);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 24px;
+      }
+
+      .glass-input {
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid rgba(210, 220, 212, 0.8);
+        backdrop-filter: blur(10px);
+      }
+
+      .glass-input:focus {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: #2e7d32;
+        outline: none;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(46, 125, 50, 0.2);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(46, 125, 50, 0.4);
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen p-3 md:p-6 flex flex-col md:flex-row gap-4 md:gap-6 antialiased selection:bg-forest-600 selection:text-white"
+  >
+    <!-- SIDEBAR NAVIGATION -->
+    <aside
+      class="glass-sidebar w-full md:w-20 lg:w-24 p-4 flex flex-col items-center justify-between shrink-0 shadow-lg"
+    >
+      <div class="flex flex-col items-center gap-6 w-full">
+        <!-- User Avatar / Brand Icon -->
+        <div class="relative group cursor-pointer">
+          <div
+            class="w-12 h-12 rounded-full bg-forest-700/10 border-2 border-forest-600/30 p-0.5 flex items-center justify-center overflow-hidden shadow-sm transition-transform hover:scale-105"
+          >
+            <img
+              src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"
+              alt="Bulbasaur"
+              class="w-10 h-10 object-contain"
+            />
+          </div>
+          <div
+            class="absolute -bottom-1 -right-1 w-4 h-4 bg-forest-600 border-2 border-white rounded-full flex items-center justify-center"
+          >
+            <i class="fa-solid fa-leaf text-[8px] text-white"></i>
+          </div>
+        </div>
+
+        <div class="w-8 h-[1px] bg-slate-300/60 my-1"></div>
+
+        <!-- Nav Icons -->
+        <nav
+          class="flex flex-row md:flex-col items-center gap-3 w-full justify-center"
+        >
+          <button
+            onclick="switchTab('overview')"
+            id="nav-overview"
+            class="nav-btn active w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-forest-700/10 hover:text-forest-700 transition-all"
+          >
+            <i class="fa-solid fa-house text-lg"></i>
+          </button>
+          <button
+            onclick="switchTab('species')"
+            id="nav-species"
+            class="nav-btn w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-forest-700/10 hover:text-forest-700 transition-all"
+          >
+            <i class="fa-solid fa-book-open text-lg"></i>
+          </button>
+          <button
+            onclick="switchTab('trainers')"
+            id="nav-trainers"
+            class="nav-btn w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-forest-700/10 hover:text-forest-700 transition-all"
+          >
+            <i class="fa-solid fa-user-group text-lg"></i>
+          </button>
+          <button
+            onclick="switchTab('queries')"
+            id="nav-queries"
+            class="nav-btn w-11 h-11 rounded-2xl flex items-center justify-center text-slate-600 hover:bg-forest-700/10 hover:text-forest-700 transition-all"
+          >
+            <i class="fa-solid fa-database text-lg"></i>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom Options -->
+      <div class="hidden md:flex flex-col items-center gap-4 w-full">
+        <div class="w-8 h-[1px] bg-slate-300/60"></div>
+        <button
+          onclick="alert('Configurações do Banco de Dados - Projeto PokéDados')"
+          class="w-10 h-10 rounded-2xl flex items-center justify-center text-slate-500 hover:bg-slate-200/60 hover:text-slate-800 transition-all"
+        >
+          <i class="fa-solid fa-gear text-base"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 flex flex-col gap-5 min-w-0">
+      <!-- WELCOME BANNER CARD -->
+      <div
+        class="glass-card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+      >
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-2xl">🍃</span>
+            <h1 class="text-2xl font-extrabold text-forest-900 tracking-tight">
+              Oiii!
+            </h1>
+          </div>
+          <p class="text-xs font-medium text-slate-600">
+            Pronto para analisar os dados do ecossistema Pokémon no MySQL?
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <div class="relative flex-1 sm:flex-initial">
+            <i
+              class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"
+            ></i>
+            <input
+              type="text"
+              id="global-search"
+              onkeyup="handleGlobalSearch()"
+              placeholder="Pesquisar espécies, treinadores..."
+              class="glass-input text-xs text-slate-700 placeholder-slate-400 rounded-xl pl-9 pr-4 py-2.5 w-full sm:w-64 font-medium transition-all"
+            />
+          </div>
+          <button
+            onclick="refreshData()"
+            class="p-2.5 bg-forest-700/10 hover:bg-forest-700/20 text-forest-800 rounded-xl transition-all text-xs font-semibold flex items-center justify-center shrink-0"
+          >
+            <i class="fa-solid fa-rotate text-sm" id="refresh-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: VISÃO GERAL (OVERVIEW) -->
+      <div id="tab-overview" class="tab-content flex flex-col gap-5">
+        <!-- KPI SUMMARY CARDS (Like image) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="glass-card p-5 flex items-center gap-4">
+            <div
+              class="w-12 h-12 rounded-2xl bg-forest-700/10 border border-forest-600/20 flex items-center justify-center text-forest-700 text-xl shrink-0"
+            >
+              <i class="fa-solid fa-leaf"></i>
+            </div>
+            <div>
+              <span
+                class="text-xs font-semibold text-slate-500 uppercase tracking-wider block"
+                >Total Espécies</span
+              >
+              <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-black text-slate-800">40</span>
+                <span
+                  class="text-[11px] font-bold text-forest-700 bg-forest-700/10 px-2 py-0.5 rounded-full"
+                  >PokéAPI v2</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card p-5 flex items-center gap-4">
+            <div
+              class="w-12 h-12 rounded-2xl bg-forest-700/10 border border-forest-600/20 flex items-center justify-center text-forest-700 text-xl shrink-0"
+            >
+              <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div>
+              <span
+                class="text-xs font-semibold text-slate-500 uppercase tracking-wider block"
+                >Treinadores</span
+              >
+              <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-black text-slate-800">7</span>
+                <span
+                  class="text-[11px] font-bold text-forest-700 bg-forest-700/10 px-2 py-0.5 rounded-full"
+                  >Pernambuco</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card p-5 flex items-center gap-4">
+            <div
+              class="w-12 h-12 rounded-2xl bg-forest-700/10 border border-forest-600/20 flex items-center justify-center text-forest-700 text-xl shrink-0"
+            >
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+              <span
+                class="text-xs font-semibold text-slate-500 uppercase tracking-wider block"
+                >Capturas</span
+              >
+              <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-black text-slate-800">60</span>
+                <span
+                  class="text-[11px] font-bold text-forest-700 bg-forest-700/10 px-2 py-0.5 rounded-full"
+                  >Registradas</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN GRID SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <!-- Left 2 Cols: Upcoming / Recent Activity -->
+          <div
+            class="glass-card p-6 lg:col-span-2 flex flex-col justify-between"
+          >
+            <div>
+              <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2">
+                  <i
+                    class="fa-solid fa-calendar-day text-forest-700 text-base"
+                  ></i>
+                  <h2 class="text-base font-bold text-slate-800">
+                    Top Espécies em Destaque
+                  </h2>
+                </div>
+                <span class="text-xs text-slate-500 font-medium"
+                  >Ordenado por Ataque Base</span
+                >
+              </div>
+
+              <div class="space-y-3" id="overview-featured-species">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <button
+              onclick="switchTab('species')"
+              class="mt-6 w-full py-2.5 text-center text-xs font-bold text-forest-700 hover:text-forest-800 hover:bg-forest-700/10 rounded-xl transition-all flex items-center justify-center gap-1"
+            >
+              Ver Pokédex completa
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+
+          <!-- Right Col: Today / Quick Tasks Style -->
+          <div class="glass-card p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-location-dot text-forest-700"></i>
+                <h2 class="text-base font-bold text-slate-800">
+                  Treinadores Ativos
+                </h2>
+              </div>
+
+              <div class="space-y-3" id="overview-trainers-list">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <button
+              onclick="switchTab('trainers')"
+              class="mt-6 w-full py-3 bg-forest-700/15 hover:bg-forest-700/25 text-forest-800 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2"
+            >
+              <i class="fa-solid fa-plus text-xs"></i> Gerenciar Capturas
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: POKÉDEX / ESPÉCIES -->
+      <div id="tab-species" class="tab-content hidden flex-col gap-5">
+        <div
+          class="glass-card p-4 flex flex-wrap items-center justify-between gap-3"
+        >
+          <div
+            class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0"
+            id="type-filter-chips"
+          >
+            <!-- Dynamic chips -->
+          </div>
+          <div class="text-xs text-slate-500 font-medium">
+            Exibindo
+            <span id="species-count-label" class="font-bold text-slate-800"
+              >40</span
+            >
+            espécies
+          </div>
+        </div>
+
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+          id="species-grid"
+        >
+          <!-- Dynamic cards -->
+        </div>
+      </div>
+
+      <!-- TAB 3: TREINADORES & CAPTURAS -->
+      <div id="tab-trainers" class="tab-content hidden flex-col gap-5">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="glass-card p-6 lg:col-span-1">
+            <h3 class="text-base font-bold text-slate-800 mb-1">
+              Cidades de Pernambuco
+            </h3>
+            <p class="text-xs text-slate-500 mb-4">
+              Origem dos treinadores cadastrados no projeto
+            </p>
+
+            <div class="space-y-3" id="trainers-full-list">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+
+          <div class="glass-card p-6 lg:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-base font-bold text-slate-800">
+                Histórico de Capturas (Simulado)
+              </h3>
+              <span class="text-xs text-slate-500 font-medium"
+                >Total: 60 capturas</span
+              >
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr
+                    class="border-b border-slate-200 text-slate-500 uppercase font-semibold"
+                  >
+                    <th class="py-2.5 px-3">Apelido</th>
+                    <th class="py-2.5 px-3">Espécie</th>
+                    <th class="py-2.5 px-3">Nível</th>
+                    <th class="py-2.5 px-3">Treinador</th>
+                    <th class="py-2.5 px-3">Data</th>
+                  </tr>
+                </thead>
+                <tbody
+                  class="divide-y divide-slate-200/60"
+                  id="captures-table-body"
+                >
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: CONSULTAS SQL (03_CONSULTAS.SQL) -->
+      <div id="tab-queries" class="tab-content hidden flex-col gap-5">
+        <div class="glass-card p-6">
+          <div
+            class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6"
+          >
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-terminal text-forest-700"></i>
+                <h2 class="text-lg font-bold text-slate-800">
+                  Consultas Analíticas (03_consultas.sql)
+                </h2>
+              </div>
+              <p class="text-xs text-slate-500">
+                Selecione uma das queries para visualizar a instrução SQL e a
+                simulação dos resultados do MySQL.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2" id="query-nav-buttons">
+              <!-- Query buttons -->
+            </div>
+          </div>
+
+          <!-- Query Code View -->
+          <div class="mb-6">
+            <div
+              class="bg-slate-800 text-slate-300 px-4 py-2 rounded-t-xl text-xs font-mono flex items-center justify-between"
+            >
+              <span
+                ><i class="fa-solid fa-code text-forest-500 mr-2"></i>SQL
+                Statement</span
+              >
+              <button
+                onclick="copySQL()"
+                class="text-slate-400 hover:text-white transition-all text-xs"
+              >
+                <i class="fa-regular fa-copy mr-1"></i>Copiar
+              </button>
+            </div>
+            <pre
+              id="sql-preview-box"
+              class="bg-slate-900 text-forest-200 p-4 rounded-b-xl font-mono text-xs overflow-x-auto leading-relaxed border border-slate-800"
+            ></pre>
+          </div>
+
+          <!-- Query Results View -->
+          <div>
+            <h3
+              class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3"
+            >
+              Resultado da Consulta:
+            </h3>
+            <div
+              class="overflow-x-auto border border-slate-200/80 rounded-xl bg-white/50 backdrop-blur"
+            >
+              <table class="w-full text-left text-xs">
+                <thead
+                  class="bg-forest-700/10 text-forest-900 font-bold border-b border-slate-200"
+                  id="query-table-head"
+                >
+                  <!-- Dynamic headers -->
+                </thead>
+                <tbody class="divide-y divide-slate-200" id="query-table-body">
+                  <!-- Dynamic body -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // MOCK DATA ALIGNED WITH THE PROJECT
+      const POKEMON_SPECIES = [
+        {
+          id: 1,
+          name: "Bulbasaur",
+          hp: 45,
+          attack: 49,
+          defense: 49,
+          speed: 45,
+          types: ["Grass", "Poison"],
+        },
+        {
+          id: 2,
+          name: "Ivysaur",
+          hp: 60,
+          attack: 62,
+          defense: 63,
+          speed: 60,
+          types: ["Grass", "Poison"],
+        },
+        {
+          id: 3,
+          name: "Venusaur",
+          hp: 80,
+          attack: 82,
+          defense: 83,
+          speed: 80,
+          types: ["Grass", "Poison"],
+        },
+        {
+          id: 4,
+          name: "Charmander",
+          hp: 39,
+          attack: 52,
+          defense: 43,
+          speed: 65,
+          types: ["Fire"],
+        },
+        {
+          id: 5,
+          name: "Charmeleon",
+          hp: 58,
+          attack: 64,
+          defense: 58,
+          speed: 80,
+          types: ["Fire"],
+        },
+        {
+          id: 6,
+          name: "Charizard",
+          hp: 78,
+          attack: 84,
+          defense: 78,
+          speed: 100,
+          types: ["Fire", "Flying"],
+        },
+        {
+          id: 7,
+          name: "Squirtle",
+          hp: 44,
+          attack: 48,
+          defense: 65,
+          speed: 43,
+          types: ["Water"],
+        },
+        {
+          id: 8,
+          name: "Wartortle",
+          hp: 59,
+          attack: 63,
+          defense: 80,
+          speed: 58,
+          types: ["Water"],
+        },
+        {
+          id: 9,
+          name: "Blastoise",
+          hp: 79,
+          attack: 83,
+          defense: 100,
+          speed: 78,
+          types: ["Water"],
+        },
+        {
+          id: 10,
+          name: "Caterpie",
+          hp: 45,
+          attack: 30,
+          defense: 35,
+          speed: 45,
+          types: ["Bug"],
+        },
+        {
+          id: 11,
+          name: "Metapod",
+          hp: 50,
+          attack: 20,
+          defense: 55,
+          speed: 30,
+          types: ["Bug"],
+        },
+        {
+          id: 12,
+          name: "Butterfree",
+          hp: 60,
+          attack: 45,
+          defense: 50,
+          speed: 70,
+          types: ["Bug", "Flying"],
+        },
+        {
+          id: 13,
+          name: "Weedle",
+          hp: 40,
+          attack: 35,
+          defense: 30,
+          speed: 50,
+          types: ["Bug", "Poison"],
+        },
+        {
+          id: 14,
+          name: "Kakuna",
+          hp: 45,
+          attack: 25,
+          defense: 50,
+          speed: 35,
+          types: ["Bug", "Poison"],
+        },
+        {
+          id: 15,
+          name: "Beedrill",
+          hp: 65,
+          attack: 90,
+          defense: 40,
+          speed: 75,
+          types: ["Bug", "Poison"],
+        },
+        {
+          id: 16,
+          name: "Pidgey",
+          hp: 40,
+          attack: 45,
+          defense: 40,
+          speed: 56,
+          types: ["Normal", "Flying"],
+        },
+        {
+          id: 25,
+          name: "Pikachu",
+          hp: 35,
+          attack: 55,
+          defense: 40,
+          speed: 90,
+          types: ["Electric"],
+        },
+        {
+          id: 26,
+          name: "Raichu",
+          hp: 60,
+          attack: 90,
+          defense: 55,
+          speed: 110,
+          types: ["Electric"],
+        },
+        {
+          id: 35,
+          name: "Clefairy",
+          hp: 70,
+          attack: 45,
+          defense: 48,
+          speed: 35,
+          types: ["Fairy"],
+        },
+        {
+          id: 39,
+          name: "Jigglypuff",
+          hp: 115,
+          attack: 45,
+          defense: 20,
+          speed: 20,
+          types: ["Normal", "Fairy"],
+        },
+      ];
+
+      const TRAINERS = [
+        { id: 1, name: "Davi", city: "Recife", captures: 12 },
+        { id: 2, name: "Ash", city: "Olinda", captures: 10 },
+        { id: 3, name: "Brock", city: "Caruaru", captures: 8 },
+        { id: 4, name: "Serena", city: "Petrolina", captures: 9 },
+        { id: 5, name: "Lucas Aprigio", city: "Garanhuns", captures: 7 },
+        {
+          id: 6,
+          name: "Mariana",
+          city: "Jaboatão dos Guararapes",
+          captures: 8,
+        },
+        { id: 7, name: "Sanalu", city: "São Lourenço da Mata", captures: 6 },
+      ];
+
+      const CAPTURES = [
+        {
+          nickname: "Trovoada",
+          pokemon: "Pikachu",
+          level: 88,
+          trainer: "Davi",
+          date: "2024-03-15",
+        },
+        {
+          nickname: "Feroz",
+          pokemon: "Charizard",
+          level: 95,
+          trainer: "Ash",
+          date: "2024-04-02",
+        },
+        {
+          nickname: "Valente",
+          pokemon: "Blastoise",
+          level: 76,
+          trainer: "Brock",
+          date: "2024-02-18",
+        },
+        {
+          nickname: "Fofinho",
+          pokemon: "Jigglypuff",
+          level: 42,
+          trainer: "Serena",
+          date: "2024-05-10",
+        },
+        {
+          nickname: "Sombra",
+          pokemon: "Beedrill",
+          level: 64,
+          trainer: "Lucas Aprigio",
+          date: "2024-01-22",
+        },
+        {
+          nickname: "Titã",
+          pokemon: "Venusaur",
+          level: 82,
+          trainer: "Mariana",
+          date: "2024-06-01",
+        },
+        {
+          nickname: "Soneca",
+          pokemon: "Bulbasaur",
+          level: 35,
+          trainer: "Sanalu",
+          date: "2024-03-29",
+        },
+      ];
+
+      const SQL_QUERIES = [
+        {
+          id: 1,
+          title: "Top 5 Ataque",
+          sql: `-- 1. Top 5 Pokémon com maior base de ataque
+SELECT numeroPokedex, nome, ataqueBase, hpBase
+FROM especies
+ORDER BY ataqueBase DESC
+LIMIT 5;`,
+          headers: ["numeroPokedex", "nome", "ataqueBase", "hpBase"],
+          rows: [
+            [15, "Beedrill", 90, 65],
+            [26, "Raichu", 90, 60],
+            [6, "Charizard", 84, 78],
+            [9, "Blastoise", 83, 79],
+            [3, "Venusaur", 82, 80],
+          ],
+        },
+        {
+          id: 2,
+          title: "Capturas/Treinador",
+          sql: `-- 2. Quantidade total de Pokémon capturados por cada treinador
+SELECT t.nome AS treinador, t.cidadeOrigem, COUNT(c.capturaID) AS total_capturas
+FROM treinadores t
+LEFT JOIN capturas c ON t.treinadorID = c.Treinadores_treinadorID
+GROUP BY t.treinadorID, t.nome, t.cidadeOrigem
+ORDER BY total_capturas DESC;`,
+          headers: ["treinador", "cidadeOrigem", "total_capturas"],
+          rows: [
+            ["Davi", "Recife", 12],
+            ["Ash", "Olinda", 10],
+            ["Serena", "Petrolina", 9],
+            ["Brock", "Caruaru", 8],
+            ["Mariana", "Jaboatão dos Guararapes", 8],
+            ["Lucas Aprigio", "Garanhuns", 7],
+            ["Sanalu", "São Lourenço da Mata", 6],
+          ],
+        },
+        {
+          id: 3,
+          title: "Média Nível/Espécie",
+          sql: `-- 3. Média de nível dos Pokémon capturados por espécie
+SELECT e.nome AS especie, ROUND(AVG(c.nivel), 1) AS media_nivel, COUNT(c.capturaID) AS quantidade_capturada
+FROM especies e
+JOIN capturas c ON e.especieID = c.especies_especieID
+GROUP BY e.especieID, e.nome
+ORDER BY media_nivel DESC;`,
+          headers: ["especie", "media_nivel", "quantidade_capturada"],
+          rows: [
+            ["Charizard", "95.0", 3],
+            ["Pikachu", "88.0", 4],
+            ["Venusaur", "82.0", 2],
+            ["Blastoise", "76.0", 3],
+          ],
+        },
+        {
+          id: 4,
+          title: "Pokémon e Tipos",
+          sql: `-- 4. Lista de Pokémon com os seus respetivos tipos
+SELECT e.numeroPokedex, e.nome AS pokemon, GROUP_CONCAT(tp.nome SEPARATOR ', ') AS tipos
+FROM especies e
+JOIN tipos_has_especies te ON e.especieID = te.especies_especieID
+JOIN tipos tp ON te.tipos_tipoID = tp.tipoID
+GROUP BY e.especieID, e.numeroPokedex, e.nome
+ORDER BY e.numeroPokedex ASC;`,
+          headers: ["numeroPokedex", "pokemon", "tipos"],
+          rows: [
+            [1, "Bulbasaur", "Grass, Poison"],
+            [2, "Ivysaur", "Grass, Poison"],
+            [3, "Venusaur", "Grass, Poison"],
+            [4, "Charmander", "Fire"],
+            [6, "Charizard", "Fire, Flying"],
+          ],
+        },
+        {
+          id: 5,
+          title: "Maior Nível Capturado",
+          sql: `-- 5. Treinador que capturou o Pokémon de maior nível
+SELECT t.nome AS treinador, e.nome AS pokemon, c.apelido, c.nivel, c.dataCaptura
+FROM capturas c
+JOIN treinadores t ON c.Treinadores_treinadorID = t.treinadorID
+JOIN especies e ON c.especies_especieID = e.especieID
+WHERE c.nivel = (SELECT MAX(nivel) FROM capturas);`,
+          headers: ["treinador", "pokemon", "apelido", "nivel", "dataCaptura"],
+          rows: [["Ash", "Charizard", "Feroz", 95, "2024-04-02"]],
+        },
+      ];
+
+      let activeTab = "overview";
+      let selectedType = "All";
+      let activeQueryId = 1;
+
+      // Switch Tabs Function
+      function switchTab(tabId) {
+        activeTab = tabId;
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((el) => el.classList.add("hidden"));
+        document.querySelectorAll(".nav-btn").forEach((btn) => {
+          btn.classList.remove("bg-forest-700/15", "text-forest-800");
+          btn.classList.add("text-slate-600");
+        });
+
+        document.getElementById(`tab-${tabId}`).classList.remove("hidden");
+        document.getElementById(`tab-${tabId}`).classList.add("flex");
+
+        const activeNavBtn = document.getElementById(`nav-${tabId}`);
+        if (activeNavBtn) {
+          activeNavBtn.classList.add("bg-forest-700/15", "text-forest-800");
+        }
+      }
+
+      // Helper: Sprite URL
+      function getSpriteUrl(id) {
+        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+      }
+
+      // Helper: Type Pill
+      function getTypePill(type) {
+        return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-forest-700/10 text-forest-800 border border-forest-600/20">${type}</span>`;
+      }
+
+      // Render Overview Tab Content
+      function renderOverview() {
+        const topAttack = [...POKEMON_SPECIES]
+          .sort((a, b) => b.attack - a.attack)
+          .slice(0, 4);
+        const featuredContainer = document.getElementById(
+          "overview-featured-species",
+        );
+
+        featuredContainer.innerHTML = topAttack
+          .map(
+            (p) => `
+                <div class="flex items-center justify-between p-3 rounded-2xl bg-white/60 border border-slate-200/80 hover:bg-white/90 transition-all">
+                    <div class="flex items-center gap-3">
+                        <img src="${getSpriteUrl(p.id)}" alt="${p.name}" class="w-10 h-10 object-contain drop-shadow-sm">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">${p.name}</h3>
+                            <div class="flex gap-1 mt-0.5">${p.types.map(getTypePill).join("")}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-bold text-forest-700 bg-forest-700/10 px-2.5 py-1 rounded-full">ATK: ${p.attack}</span>
+                    </div>
+                </div>
+            `,
+          )
+          .join("");
+
+        const trainersContainer = document.getElementById(
+          "overview-trainers-list",
+        );
+        trainersContainer.innerHTML = TRAINERS.slice(0, 4)
+          .map(
+            (t) => `
+                <div class="flex items-center justify-between p-3 rounded-2xl bg-white/60 border border-slate-200/80">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-forest-700/10 text-forest-800 font-bold flex items-center justify-center text-xs">
+                            ${t.name.charAt(0)}
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-800">${t.name}</p>
+                            <p class="text-[10px] text-slate-500">${t.city}</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-semibold text-slate-600 font-mono">${t.captures} cap.</span>
+                </div>
+            `,
+          )
+          .join("");
+      }
+
+      // Render Species Grid
+      function renderSpeciesGrid() {
+        const grid = document.getElementById("species-grid");
+        const searchVal = document
+          .getElementById("global-search")
+          .value.toLowerCase();
+
+        const filtered = POKEMON_SPECIES.filter((p) => {
+          const matchesSearch =
+            p.name.toLowerCase().includes(searchVal) ||
+            p.id.toString() === searchVal;
+          const matchesType =
+            selectedType === "All" || p.types.includes(selectedType);
+          return matchesSearch && matchesType;
+        });
+
+        document.getElementById("species-count-label").innerText =
+          filtered.length;
+
+        grid.innerHTML = filtered
+          .map(
+            (p) => `
+                <div class="glass-card p-4 flex flex-col justify-between hover:scale-[1.02] transition-transform">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[11px] font-mono font-bold text-slate-400">#${String(p.id).padStart(3, "0")}</span>
+                            <div class="flex gap-1">${p.types.map(getTypePill).join("")}</div>
+                        </div>
+                        <div class="flex items-center justify-center py-2">
+                            <img src="${getSpriteUrl(p.id)}" alt="${p.name}" class="w-20 h-20 object-contain drop-shadow">
+                        </div>
+                        <h4 class="text-center text-sm font-extrabold text-slate-800 mb-3">${p.name}</h4>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-[10px] bg-white/60 p-2.5 rounded-xl border border-slate-200/60 font-semibold text-slate-600">
+                        <div>HP: <span class="font-bold text-slate-800">${p.hp}</span></div>
+                        <div>ATK: <span class="font-bold text-forest-700">${p.attack}</span></div>
+                        <div>DEF: <span class="font-bold text-slate-800">${p.defense}</span></div>
+                        <div>SPD: <span class="font-bold text-slate-800">${p.speed}</span></div>
+                    </div>
+                </div>
+            `,
+          )
+          .join("");
+      }
+
+      // Type Filter Chips
+      function renderTypeFilterChips() {
+        const types = [
+          "All",
+          "Grass",
+          "Fire",
+          "Water",
+          "Bug",
+          "Normal",
+          "Electric",
+          "Fairy",
+        ];
+        const container = document.getElementById("type-filter-chips");
+
+        container.innerHTML = types
+          .map(
+            (t) => `
+                <button onclick="filterType('${t}')" class="px-3 py-1 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${t === selectedType ? "bg-forest-700 text-white shadow-sm" : "bg-white/60 text-slate-600 hover:bg-white"}">
+                    ${t === "All" ? "Todos" : t}
+                </button>
+            `,
+          )
+          .join("");
+      }
+
+      function filterType(t) {
+        selectedType = t;
+        renderTypeFilterChips();
+        renderSpeciesGrid();
+      }
+
+      // Render Trainers & Captures
+      function renderTrainersAndCaptures() {
+        const trainersList = document.getElementById("trainers-full-list");
+        trainersList.innerHTML = TRAINERS.map(
+          (t) => `
+                <div class="p-3 rounded-2xl bg-white/60 border border-slate-200/80 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-forest-700/10 text-forest-800 font-bold flex items-center justify-center text-xs">
+                            ${t.name.charAt(0)}
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-800">${t.name}</p>
+                            <p class="text-[10px] text-slate-500"><i class="fa-solid fa-location-dot text-forest-700"></i> ${t.city}</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-bold text-forest-800 bg-forest-700/10 px-2.5 py-1 rounded-full">${t.captures} Pokémon</span>
+                </div>
+            `,
+        ).join("");
+
+        const capturesBody = document.getElementById("captures-table-body");
+        capturesBody.innerHTML = CAPTURES.map(
+          (c) => `
+                <tr class="hover:bg-white/40 transition-all">
+                    <td class="py-2.5 px-3 font-bold text-slate-800">${c.nickname}</td>
+                    <td class="py-2.5 px-3 text-slate-600">${c.pokemon}</td>
+                    <td class="py-2.5 px-3"><span class="bg-forest-700/10 text-forest-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Lvl ${c.level}</span></td>
+                    <td class="py-2.5 px-3 text-slate-600 font-semibold">${c.trainer}</td>
+                    <td class="py-2.5 px-3 text-slate-400 font-mono">${c.date}</td>
+                </tr>
+            `,
+        ).join("");
+      }
+
+      // Render Queries
+      function setupQueryRunner() {
+        const nav = document.getElementById("query-nav-buttons");
+        nav.innerHTML = SQL_QUERIES.map(
+          (q) => `
+                <button onclick="selectQuery(${q.id})" id="btn-query-${q.id}" class="px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${q.id === activeQueryId ? "bg-forest-700 text-white border-forest-700 shadow-sm" : "bg-white/60 text-slate-600 border-slate-200 hover:bg-white"}">
+                    Query #${q.id}
+                </button>
+            `,
+        ).join("");
+
+        selectQuery(activeQueryId);
+      }
+
+      function selectQuery(id) {
+        activeQueryId = id;
+        const q = SQL_QUERIES.find((item) => item.id === id);
+
+        SQL_QUERIES.forEach((item) => {
+          const btn = document.getElementById(`btn-query-${item.id}`);
+          if (btn) {
+            btn.className = `px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${item.id === id ? "bg-forest-700 text-white border-forest-700 shadow-sm" : "bg-white/60 text-slate-600 border-slate-200 hover:bg-white"}`;
+          }
+        });
+
+        document.getElementById("sql-preview-box").innerText = q.sql;
+
+        const thead = document.getElementById("query-table-head");
+        thead.innerHTML = `<tr>${q.headers.map((h) => `<th class="py-2.5 px-3 font-bold">${h}</th>`).join("")}</tr>`;
+
+        const tbody = document.getElementById("query-table-body");
+        tbody.innerHTML = q.rows
+          .map(
+            (row) => `
+                <tr class="hover:bg-white/40 transition-all">
+                    ${row.map((cell) => `<td class="py-2.5 px-3 font-medium text-slate-700">${cell}</td>`).join("")}
+                </tr>
+            `,
+          )
+          .join("");
+      }
+
+      function copySQL() {
+        const q = SQL_QUERIES.find((item) => item.id === activeQueryId);
+        if (q) {
+          document.execCommand("copy");
+          alert("Query SQL copiada!");
+        }
+      }
+
+      function handleGlobalSearch() {
+        if (activeTab === "species") {
+          renderSpeciesGrid();
+        }
+      }
+
+      function refreshData() {
+        const icon = document.getElementById("refresh-icon");
+        icon.classList.add("fa-spin");
+        setTimeout(() => {
+          icon.classList.remove("fa-spin");
+          renderOverview();
+          renderSpeciesGrid();
+          renderTrainersAndCaptures();
+        }, 500);
+      }
+
+      window.onload = function () {
+        switchTab("overview");
+        renderTypeFilterChips();
+        renderOverview();
+        renderSpeciesGrid();
+        renderTrainersAndCaptures();
+        setupQueryRunner();
+      };
+    </script>
+  </body>
+</html>
